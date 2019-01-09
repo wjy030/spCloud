@@ -31,3 +31,20 @@ eureka:
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/     //设置eureka服务器所在的地址，查询服务和注册服务都需要依赖这个地址。eureka/是固定值
 ```
+## Eureka 客户端搭建
+在spring boot模块中引入Eureka Client启动器
+```
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+```
+主配置文件基本配置
+```
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/  //设置eureka服务器所在的地址,eureka客户端在这个地址注册和查询服务
+  instance:
+    appname: product-service  //设置分布式系统当前模块的应用名称
+```
