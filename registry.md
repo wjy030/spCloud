@@ -3,6 +3,8 @@
 * Zookeeper: CP 设计,保证了一致性,集群搭建的时候有个leader节点.leader节点失效会自动重新选举leader节点,
 或者半数以上节点不可用,则无法提供服务,因此可用性没法满足
 * Eureka: AP原则,无主从节点,一个节点挂了,自动切换其他节点可以使用,去中心化
+## 注册中心原理
+![原理](registry.png)
 ## Eureka 服务端搭建
 在spring boot模块中引入Eureka Server启动器
 ```
