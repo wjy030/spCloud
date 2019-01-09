@@ -29,5 +29,5 @@ eureka:
     registerWithEureka: false    //表示是否注册自身到eureka服务器，因为当前这个应用就是eureka服务器，没必要注册自身，所以这里是false
     fetchRegistry: false    //表示是否从eureka服务器获取注册信息，同上，这里不需要
     serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/     //设置eureka服务器所在的地址，查询服务和注册服务都需要依赖这个地址。eureka是固定值
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/     //设置eureka服务器所在的地址，查询服务和注册服务都需要依赖这个地址。eureka/是固定值
 ```
