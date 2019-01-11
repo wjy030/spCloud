@@ -113,3 +113,11 @@ public class EurekaSecurityConfig extends WebSecurityConfigurerAdapter {
 ```
 ## Eureka注册中心界面介绍
 ![界面](dashbord.png)
+### System status
+* Environment 环境名  对应主配置文件属性名: eureka.environment
+* Data center 数据中心名  对应主配置文件属性名: eureka.datacenter
+* Current time 当前时间
+* Uptime 启动过了多久
+* Lease expiration enabled
+* Renews threshold server期望在每分钟中收到的心跳次数 **client个数为n，阈值为1+2*n（此为一个server且禁止自注册的情况）**
+* Renews (last min) 上一分钟内收到的心跳次数
