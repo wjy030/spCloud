@@ -140,5 +140,5 @@ Eureka实例注册列表
 * available-replicas  集群相关 可用节点
 ### Instance Info
 当前注册中心服务的实例信息
-ipAddr 实例的ip
-status 实例的状态（是否可运行）
+* ipAddr 实例的ip
+* status 实例的状态（是否可运行）
