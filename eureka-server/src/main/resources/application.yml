@@ -1,6 +1,8 @@
 server:
   port: 8761
 eureka:
+  environment: prod
+  datacenter: home
   instance:
     hostname: localhost
   client:
@@ -8,3 +10,8 @@ eureka:
     fetchRegistry: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+spring:
+  security:
+    user:
+      name: arthas
+      password: 123456
