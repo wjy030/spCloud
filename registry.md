@@ -121,3 +121,24 @@ public class EurekaSecurityConfig extends WebSecurityConfigurerAdapter {
 * Lease expiration enabled
 * Renews threshold server期望在每分钟中收到的心跳次数 **client个数为n，阈值为1+2*n（此为一个server且禁止自注册的情况）**
 * Renews (last min) 上一分钟内收到的心跳次数
+### DS Replicas
+集群相关配置
+### Instances currently registered with Eureka
+Eureka实例注册列表
+* Application 客户端应用名
+* Availability Zones 该应用下所有可获取的客户端的域/ip的数量
+* Status 客户端的状态（是否在运行） 可获取的域地址
+### General Info
+概况信息
+* total-avail-memory 所有可用内存
+* environment 环境名
+* num-of-cpus cpu数
+* current-memory-usage  已使用内存
+* server-uptime  服务已启动多久
+* registered-replicas 集群相关，已注册的服务节点。这些节点间会有数据同步
+* unavailable-replicas  集群相关 不可用节点
+* available-replicas  集群相关 可用节点
+### Instance Info
+当前注册中心服务的实例信息
+ipAddr 实例的ip
+status 实例的状态（是否可运行）
