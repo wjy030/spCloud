@@ -64,6 +64,21 @@ eureka:
 </dependency>
 ```
 引入后就启用安全控制,默认用户名为user,密码在启动时会心uuid方式生成并输出在日志中
+#### 引入后要取消安全控制
+旧版本在主配置文件上可以配置
+```
+security:
+  basic:
+    enabled: false 
+```
+该配置默认为true,可以改为false.**新版本该配置已不可用**  
+新版本取消安全控制的方法:   
+在主启动类或任意配置类上加上注解  
+```
+@EnableAutoConfiguration(exclude = {
+		org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class
+})
+```
 ### 指定用户名密码
 在主配置文件中
 ```
@@ -96,3 +111,5 @@ public class EurekaSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 }
 ```
+## Eureka注册中心界面介绍
+![界面](dashbord.png)
