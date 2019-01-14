@@ -142,3 +142,12 @@ Eureka实例注册列表
 当前注册中心服务的实例信息
 * ipAddr 实例的ip
 * status 实例的状态（是否可运行）
+## 控制台访问控制
+```
+eureka:
+  dashboard:
+      enabled: true
+      path: /dashbord
+```
+* eureka.dashboard.enabled 控制是否能访问注册中心控制台,false就不能访问,默认true
+* eureka.dashboard.path 注册中心访问根路径设置,默认为/,设置为/dashbord 则访问路径为 http://localhost:8761/dashbord
