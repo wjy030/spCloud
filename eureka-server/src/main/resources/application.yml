@@ -1,6 +1,5 @@
 server:
   port: 8761
-eureka:
   environment: prod
   datacenter: home
   instance:
@@ -15,3 +14,10 @@ spring:
     user:
       name: arthas
       password: 123456
+#eureka:
+#  server:
+#    enable-self-preservation: true
+#    renewal-percent-threshold: 0.85
+#    renewal-threshold-update-interval-ms: 6000
+#    eviction-interval-timer-in-ms: 5000
+#    delta-retention-timer-interval-in-ms: 30000
