@@ -167,6 +167,20 @@ Eureka client会从Eureka server获取注册表信息并缓存在本地并默认
 3. 自我保护,当一个Eureka服务器出现时,尝试从相邻Peer节点(即集群中的节点)获取注册列表.如果获取注册列表出现问题,会尝试从其他Peer节点
 获取注册列表.如果Eureka服务器成功获取了所有服务实例,则会根据该信息计算出更新阈值(Renews threshold),当规定时间(默认15分钟)内服务器
 接收到的续约低于该阈值的指定百分比(默认85%),则会开启自我保护模式,即不再剔除注册列表信息.
-
-
+### 主文件中的自我保护相关配置
+```
+eureka:
+  server:
+    enable-self-preservation: true
+    renewal-percent-threshold: 0.85
+    renewal-threshold-update-interval-ms: 6000
+    eviction-interval-timer-in-ms: 5000
+    delta-retention-timer-interval-in-ms: 30000
+```
+* enable-self-preservation: 是否启用自我保护模式 默认true
+* renewal-percent-threshold: 指定一个百分比,默认为0.85,当规定时间内Eureka server收到的续约低于**Renews threshold * 指定百分比**时
+会开启自我保护模式
+* renewal-threshold-update-interval-ms: 指定更新续约阈值的时间,单位微秒,Eureka server每隔指定的时间会重新计算续约阈值,默认值15*60*1000
+* eviction-interval-timer-in-ms: 指定剔除服务的间隔时间,单位微秒,Eureka server根据指定间隔定期剔除没有续约的服务
+* delta-retention-timer-interval-in-ms: 指定清理任务程序被唤醒的时间间隔,清理过期的增量信息,单位为毫秒,默认为30 * 1000
 
