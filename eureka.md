@@ -201,4 +201,5 @@ spring:
 * 其他相关配置:appname,instance-id,prefer-ip-address
 * prefer-ip-address 默认false,配置true后在向其他服务器注册时会提供ip而不是机器名
 ![配置](pp.png)
-
+图中 点击server:8762后,当prefer-ip-address=false,会跳转到``http://suneee-PC:8762/actuator/info``,其中sunee-PC是机器名.
+当设置为true时,会跳转到``http://172.19.14.159:8763/actuator/info``
