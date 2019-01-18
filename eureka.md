@@ -14,7 +14,7 @@
 public class EurekaServerApplication {
 ```
 主配置文件基本配置  
-此为单例模式的配置,通常的配置是集群模式  
+**此为单例模式的配置,通常的配置是集群模式**  
 ```
 server:
   port: 8761   //服务端口
