@@ -183,4 +183,22 @@ eureka:
 * renewal-threshold-update-interval-ms: 指定更新续约阈值的时间,单位微秒,Eureka server每隔指定的时间会重新计算续约阈值,默认值15*60*1000
 * eviction-interval-timer-in-ms: 指定剔除服务的间隔时间,单位微秒,Eureka server根据指定间隔定期剔除没有续约的服务
 * delta-retention-timer-interval-in-ms: 指定清理任务程序被唤醒的时间间隔,清理过期的增量信息,单位为毫秒,默认为30 * 1000
+## 高可用
+```
+eureka:
+  instance:
+    hostname: peer3
+    appname: server
+    prefer-ip-address: true
+    instance-id: ${eureka.instance.appname}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://peer2:8762/eureka/,http://arthas:123456@peer1:8761/eureka/
+spring:
+  profiles: peer3
+```
+* 关键点:**在每一个集群节点中的defaultZone配置其他的集群节点,以 , 分隔**
+* 其他相关配置:appname,instance-id,prefer-ip-address
+* prefer-ip-address 默认false,配置true后在向其他服务器注册时会提供ip而不是机器名
+![配置](pp.png)
 
