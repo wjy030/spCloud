@@ -202,4 +202,6 @@ spring:
 * prefer-ip-address 默认false,配置true后在向其他服务器注册时会提供ip而不是机器名
 ![配置](pp.png)
 图中 点击server:8762后,当prefer-ip-address=false,会跳转到``http://suneee-PC:8762/actuator/info``,其中sunee-PC是机器名.
-当设置为true时,会跳转到``http://172.19.14.159:8763/actuator/info``
+当设置为true时,会跳转到``http://172.19.14.159:8763/actuator/info``  
+**当eureka client向eureka server注册时只要在defaultZone配置任一peer节点,所有节点都会被注册.但是当该服务down掉时,client也就down掉了.因此
+应该在client的defaultZone中配置server的所有peer节点**
