@@ -262,4 +262,26 @@ private static final Logger log = LoggerFactory.getLogger(ServerListener.class);
 #### @EnableDiscoveryClient与@EnableEurekaClient
 1. @EnableDiscoveryClient注解是基于spring-cloud-commons依赖，不针对eureka 
 2. @EnableEurekaClient注解是基于spring-cloud-starter-netflix-eureka-client依赖，只能为eureka作用；
-3. ##从Spring Cloud Edgware开始，@EnableDiscoveryClient 或@EnableEurekaClient 可省略。只需加上相关依赖，并进行相应配置，即可将微服务注册到服务发现组件上。##
+3. **从Spring Cloud Edgware开始，@EnableDiscoveryClient 或@EnableEurekaClient 可省略。只需加上相关依赖，并进行相应配置，即可将微服务注册到服务发现组件上。**
+#### EurekaDiscoveryClient类与DiscoveryClient类
+DiscoveryClient类是更高级的抽象,优点与上面相同,可以通过该类查找服务实例相关信息
+```
+@Controller
+public class ServerController {
+
+    @Resource
+    private DiscoveryClient discoveryClient;
+    @Resource
+    private EurekaDiscoveryClient eurekaDiscoveryClient;
+
+    @GetMapping("/info")
+    @ResponseBody
+    public void info() {
+        for(String serv: discoveryClient.getServices()) {
+            System.out.println("--------"+serv);
+            System.out.println(eurekaDiscoveryClient.description());
+            eurekaDiscoveryClient.getInstances(serv).forEach(a -> System.out.println("*******"+a));
+        }
+    }
+}
+```
