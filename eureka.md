@@ -205,3 +205,57 @@ spring:
 当设置为true时,会跳转到``http://172.19.14.159:8763/actuator/info``  
 **当eureka client向eureka server注册时只要在defaultZone配置任一peer节点,所有节点都会被注册.但是当该服务down掉时,client也就down掉了.因此
 应该在client的defaultZone中配置server的所有peer节点**
+## Eureka编程
+在Eureka服务端可以通过编程做些监听或查询的工作
+### Eureka的监听事件
+通过Spring的事件ApplicationEvent及监听@EventListener实现  
+#### spring事件简介
+* 通过继承ApplicationEvent创建spring事件``public class EmailEvent extends ApplicationEvent {``
+* 通过@EventListener实现对该事件的监听
+```
+@EventListener
+public void listen(EmailEvent emailEvent) {
+    emailEvent.print();
+}
+```
+* 通过ApplicationContext发布事件,相应的监听方法就会被调用
+```
+EmailEvent event = new EmailEvent("hello","boylmx@163.com","this is a email text!");
+context.publishEvent(event);
+```
+#### Eureka的事件元素
+* EurekaInstanceRegisteredEvent 实例注册事件,每当接收到一个eureka实例的注册就会触发
+* EurekaInstanceRenewedEvent 实例续约事件,每当接收到一个续约就会触发
+* EurekaRegistryAvailableEvent 注册中心启动完毕事件,注册中心启动完毕时会触发,此时注册中心是可得到的
+* EurekaServerStartedEvent Eureka服务器启动完毕事件,Eureka服务器启动完毕时会触发
+* EurekaInstanceCanceledEvent 实例下线事件,每当有一个实例下线时会触发
+```
+@Component
+public class ServerListener {
+private static final Logger log = LoggerFactory.getLogger(ServerListener.class);
+    @EventListener
+    public void listen(EurekaInstanceRegisteredEvent event) {
+        log.info(">>>>>>这是实例注册事件: instance:"+event.getInstanceInfo().getInstanceId());
+    }
+
+    @EventListener
+    public void listen(EurekaInstanceRenewedEvent event) {
+        log.info(">>>>>>这是实例续约事件: instance:"+event.getInstanceInfo().getInstanceId());
+    }
+
+    @EventListener
+    public void listen(EurekaRegistryAvailableEvent event) {
+        log.info(">>>>>>这是注册中心启动完毕事件: "+event.getSource());
+    }
+
+    @EventListener
+    public void listen(EurekaServerStartedEvent event) {
+        log.info(">>>>>>这是Eureka服务器启动完毕事件: "+event.getSource());
+    }
+
+    @EventListener
+    public void listen(EurekaInstanceCanceledEvent event) {
+        log.info(">>>>>>这是实例下线中心事件: "+event.getAppName());
+    }
+}
+```
