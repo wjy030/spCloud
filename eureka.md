@@ -48,6 +48,7 @@ eureka:
   instance:
     appname: product-service  //设置分布式系统当前模块的应用名称
 ```
+**要注册服务供别人调用必须配置spring.application.name.别人通过这个值来调用服务如http://product-service/product/findById/{1}**
 ## Eureka安全控制
 引入安全控制后Eureka注册中心会启用密码认证,登录注册中心时需要输入用户名密码
 ### 引入
@@ -198,6 +199,7 @@ spring:
   profiles: peer3
 ```
 * 关键点:**在每一个集群节点中的defaultZone配置其他的集群节点,以 , 分隔**
+* **client每个集群节点的spring.application.name要是相同的**
 * 其他相关配置:appname,instance-id,prefer-ip-address
 * prefer-ip-address 默认false,配置true后在向其他服务器注册时会提供ip而不是机器名
 ![配置](pp.png)
