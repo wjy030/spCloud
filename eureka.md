@@ -199,7 +199,7 @@ spring:
   profiles: peer3
 ```
 * 关键点:**在每一个集群节点中的defaultZone配置其他的集群节点,以 , 分隔**
-* **client每个集群节点的spring.application.name要是相同的**
+* **client每个集群节点的spring.application.name要是相同的,以实现负载均衡调用**
 * 其他相关配置:appname,instance-id,prefer-ip-address
 * prefer-ip-address 默认false,配置true后在向其他服务器注册时会提供ip而不是机器名
 ![配置](pp.png)
