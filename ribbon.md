@@ -45,3 +45,6 @@ product-service:
   ribbon:
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
 ```    
+### 策略选择
+1. 如果每个机器配置一样，则建议不修改策略 (推荐) 默认策略为轮询
+2. 如果部分机器配置强，则可以改为 WeightedResponseTimeRule 权重
