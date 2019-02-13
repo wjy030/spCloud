@@ -64,3 +64,42 @@ product-service:
 ### 策略选择
 1. 如果每个机器配置一样，则建议不修改策略 (推荐) 默认策略为轮询
 2. 如果部分机器配置强，则可以改为 WeightedResponseTimeRule 权重
+## Ribbon编程方式自定义配置
+在Ribbon启动器中RibbonClientConfiguration类,其中的各种方法提供了所有Ribbon客户端的默认配置.如:
+```
+@Bean
+@ConditionalOnMissingBean
+public IRule ribbonRule(IClientConfig config) {
+    if (this.propertiesFactory.isSet(IRule.class, name)) {
+        return this.propertiesFactory.get(IRule.class, config, name);
+    }
+    ZoneAvoidanceRule rule = new ZoneAvoidanceRule();
+    rule.initWithNiwsConfig(config);
+    return rule;
+}
+```
+该方法提供了调用服务时使用的负载均衡的策略.  
+可以自定义配置类,用同名方法替代的方式实现自定义配置. 如:
+```
+@Configuration
+public class CustomizedRibbon {
+
+    @Bean
+    public IRule ribbonRule(IClientConfig config) {
+        RandomRule rule = new RandomRule();
+        return rule;
+    }
+}
+```
+在启动类中以注解方式启用该配置类:
+```
+@SpringBootApplication
+@RibbonClients(defaultConfiguration = RibbonClientConfiguration.class,value = {@RibbonClient(name="product-service",
+        configuration = CustomizedRibbon.class)})
+public class OrderServiceApplication {
+```
+* @RibbonClient 可以单独使用,但一般消费方会面对多个服务提供方,@RibbonClient只能对一个提供方进行配置,所以通常使用的都是@RibbonClients
+* defaultConfiguration = RibbonClientConfiguration.class 指定默认配置类
+* @RibbonClient(name="product-service",configuration = CustomizedRibbon.class) 针对服务product-service使用CustomizedRibbon配置类,
+其中的配置方法会优先于默认配置类中的配置方法被调用.product-service为服务应用名(spring.application.name)
+* **自定义类一般不能被spring扫描到,即不能存在于启动类的同级或下级目录中,也不能在ComponentScan注解范围中,否则对所有服务都会使用该配置类,@RibbonClients中的指定都会失效**
