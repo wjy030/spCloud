@@ -14,7 +14,7 @@
 public class EurekaServerApplication {
 ```
 主配置文件基本配置  
-此为单例模式的配置,通常的配置是集群模式  
+**此为单例模式的配置,通常的配置是集群模式**  
 ```
 server:
   port: 8761   //服务端口
@@ -48,6 +48,7 @@ eureka:
   instance:
     appname: product-service  //设置分布式系统当前模块的应用名称
 ```
+**要注册服务供别人调用必须配置spring.application.name.别人通过这个值来调用服务如http://product-service/product/findById/{1}**
 ## Eureka安全控制
 引入安全控制后Eureka注册中心会启用密码认证,登录注册中心时需要输入用户名密码
 ### 引入
@@ -183,4 +184,106 @@ eureka:
 * renewal-threshold-update-interval-ms: 指定更新续约阈值的时间,单位微秒,Eureka server每隔指定的时间会重新计算续约阈值,默认值15*60*1000
 * eviction-interval-timer-in-ms: 指定剔除服务的间隔时间,单位微秒,Eureka server根据指定间隔定期剔除没有续约的服务
 * delta-retention-timer-interval-in-ms: 指定清理任务程序被唤醒的时间间隔,清理过期的增量信息,单位为毫秒,默认为30 * 1000
+## 高可用
+```
+eureka:
+  instance:
+    hostname: peer3
+    appname: server
+    prefer-ip-address: true
+    instance-id: ${eureka.instance.appname}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://peer2:8762/eureka/,http://arthas:123456@peer1:8761/eureka/
+spring:
+  profiles: peer3
+```
+* 关键点:**在每一个集群节点中的defaultZone配置其他的集群节点,以 , 分隔**
+* **client每个集群节点的spring.application.name要是相同的,以实现负载均衡调用**
+* 其他相关配置:appname,instance-id,prefer-ip-address
+* prefer-ip-address 默认false,配置true后在向其他服务器注册时会提供ip而不是机器名
+![配置](pp.png)
+图中 点击server:8762后,当prefer-ip-address=false,会跳转到``http://suneee-PC:8762/actuator/info``,其中sunee-PC是机器名.
+当设置为true时,会跳转到``http://172.19.14.159:8763/actuator/info``  
+**当eureka client向eureka server注册时只要在defaultZone配置任一peer节点,所有节点都会被注册.但是当该服务down掉时,client也就down掉了.因此
+应该在client的defaultZone中配置server的所有peer节点**
+## Eureka编程
+在Eureka服务端可以通过编程做些监听或查询的工作
+### Eureka的监听事件
+通过Spring的事件ApplicationEvent及监听@EventListener实现  
+#### spring事件简介
+* 通过继承ApplicationEvent创建spring事件``public class EmailEvent extends ApplicationEvent {``
+* 通过@EventListener实现对该事件的监听
+```
+@EventListener
+public void listen(EmailEvent emailEvent) {
+    emailEvent.print();
+}
+```
+* 通过ApplicationContext发布事件,相应的监听方法就会被调用
+```
+EmailEvent event = new EmailEvent("hello","boylmx@163.com","this is a email text!");
+context.publishEvent(event);
+```
+#### Eureka的事件元素
+* EurekaInstanceRegisteredEvent 实例注册事件,每当接收到一个eureka实例的注册就会触发
+* EurekaInstanceRenewedEvent 实例续约事件,每当接收到一个续约就会触发
+* EurekaRegistryAvailableEvent 注册中心启动完毕事件,注册中心启动完毕时会触发,此时注册中心是可得到的
+* EurekaServerStartedEvent Eureka服务器启动完毕事件,Eureka服务器启动完毕时会触发
+* EurekaInstanceCanceledEvent 实例下线事件,每当有一个实例下线时会触发
+```
+@Component
+public class ServerListener {
+private static final Logger log = LoggerFactory.getLogger(ServerListener.class);
+    @EventListener
+    public void listen(EurekaInstanceRegisteredEvent event) {
+        log.info(">>>>>>这是实例注册事件: instance:"+event.getInstanceInfo().getInstanceId());
+    }
 
+    @EventListener
+    public void listen(EurekaInstanceRenewedEvent event) {
+        log.info(">>>>>>这是实例续约事件: instance:"+event.getInstanceInfo().getInstanceId());
+    }
+
+    @EventListener
+    public void listen(EurekaRegistryAvailableEvent event) {
+        log.info(">>>>>>这是注册中心启动完毕事件: "+event.getSource());
+    }
+
+    @EventListener
+    public void listen(EurekaServerStartedEvent event) {
+        log.info(">>>>>>这是Eureka服务器启动完毕事件: "+event.getSource());
+    }
+
+    @EventListener
+    public void listen(EurekaInstanceCanceledEvent event) {
+        log.info(">>>>>>这是实例下线中心事件: "+event.getAppName());
+    }
+}
+```
+#### @EnableDiscoveryClient与@EnableEurekaClient
+1. @EnableDiscoveryClient注解是基于spring-cloud-commons依赖，不针对eureka 
+2. @EnableEurekaClient注解是基于spring-cloud-starter-netflix-eureka-client依赖，只能为eureka作用；
+3. **从Spring Cloud Edgware开始，@EnableDiscoveryClient 或@EnableEurekaClient 可省略。只需加上相关依赖，并进行相应配置，即可将微服务注册到服务发现组件上。**
+#### EurekaDiscoveryClient类与DiscoveryClient类
+DiscoveryClient类是更高级的抽象,优点与上面相同,可以通过该类查找服务实例相关信息
+```
+@Controller
+public class ServerController {
+
+    @Resource
+    private DiscoveryClient discoveryClient;
+    @Resource
+    private EurekaDiscoveryClient eurekaDiscoveryClient;
+
+    @GetMapping("/info")
+    @ResponseBody
+    public void info() {
+        for(String serv: discoveryClient.getServices()) {
+            System.out.println("--------"+serv);
+            System.out.println(eurekaDiscoveryClient.description());
+            eurekaDiscoveryClient.getInstances(serv).forEach(a -> System.out.println("*******"+a));
+        }
+    }
+}
+```
