@@ -62,8 +62,35 @@ product-service:
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
 ```    
 ### 策略选择
-1. 如果每个机器配置一样，则建议不修改策略 (推荐) 默认策略为轮询
+1. 如果每个机器配置一样，则建议不修改策略 (推荐)
 2. 如果部分机器配置强，则可以改为 WeightedResponseTimeRule 权重
+### Ribbon所有的负载均衡策略
+* BestAvailableRule 选择一个最小的并发请求的server. 逐个考察Server,如果Server被tripped了,则忽略,在选择其中ActiveRequestsCount最小的Server
+* AvailablityFilteringRule 过滤掉那些因为一直失败的被标记为ciruit tripped的后端server,并过滤掉那些高并发的后端server(active connections超过配置的阈值). 使用一个AvailabilityPredicate来包含过滤server的逻辑,其实就是检查status里记录的各个server的运行状态
+* WeightedResponseTimeRule 根据响应时间分配一个weight,响应时间越长,weight越小,被选中的可能性越低. 一个后台线程定期的从status里面读取评价响应时间,为每个server计算一个weight.weight的计算也比较简单responsetime减去每个server自己平均的responsetime是server的权重.当刚开始运行,没有形成status时,使用roubine策略选择server
+* RetryRule 对选定的负载均衡策略机上重试机制. 在一个配置时间段内当选择server不成功,则一直尝试使用subRule的方式选择一个可用的server
+* RoundRobinRule 以轮询方式选择server
+* RandomRule 以随机方式选择server
+* ZoneAvoidanceRule 复合判断server所在区域的性能和server的可用性选择server. 使用ZoneAvoidancePredicate和AvaliabilityPredicate来判断是否选择某个server,前一个判断判定一个zone的运行性能是否可用,剔除不可用的zone(的所有server),AvailabilityPredicate用于过滤掉连接数过多的Server
+## Ribbon在配置文件中自定义配置
+```
+product-service:
+  ribbon:
+    #负载均衡策略
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+    #最大重试次数
+    MaxAutoRetries: 2
+    #最大重试服务器次数(比如设为1,集群总共3个节点,尝了第一个节点没连上后会尝试第二个节点,不成功就不会再尝第三个节点了)
+    MaxAutoRetriesNextServer: 2
+    #是否所有操作都可以重试.通常为false,post请求不会重试
+    OkToRetryOnAllOperations: false
+    #服务列表刷新间隔
+    ServerListRefreshInterval: 2000
+    #连接超时设置
+    ConnectTimeout: 3000
+    #读取返回超时设置
+    ReadTimeout: 3000
+```    
 ## Ribbon编程方式自定义配置
 在Ribbon启动器中RibbonClientConfiguration类,其中的各种方法提供了所有Ribbon客户端的默认配置.如:
 ```
