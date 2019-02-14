@@ -130,3 +130,22 @@ public class OrderServiceApplication {
 * @RibbonClient(name="product-service",configuration = CustomizedRibbon.class) 针对服务product-service使用CustomizedRibbon配置类,
 其中的配置方法会优先于默认配置类中的配置方法被调用.product-service为服务应用名(spring.application.name)
 * **自定义类一般不能被spring扫描到,即不能存在于启动类的同级或下级目录中,也不能在ComponentScan注解范围中,否则对所有服务都会使用该配置类,@RibbonClients中的指定都会失效**
+## Ribbon脱离eureka单独使用
+### 禁用eureka
+可以不引用eureka启动器,如果引用了也可以在配置文件中禁用
+```
+ribbon:
+  eureka:
+    enabled: false
+```
+### 单独使用
+配置文件中配置
+```
+product-service:
+  ribbon:
+    listOfServers: 127.0.0.1:8771,127.0.0.1:8772
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+```
+服务product有两个节点,ip如上,策略为随机  
+使用:``restTemplate.getForObject(new URI("http://product-service/product/list"), Object.class)``
+
