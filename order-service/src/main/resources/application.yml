@@ -1,10 +1,10 @@
 server:
-  port: 8771
+  port: 8781
 spring:
   profiles:
     active: comp
   application:
-    name: product-service
+    name: order-service
 eureka:
   client:
     serviceUrl:
@@ -14,6 +14,22 @@ management:
     web:
       exposure:
         include: '*'
+product-service:
+  ribbon:
+    #负载均衡策略
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+    #最大重试次数
+    MaxAutoRetries: 2
+    #最大重试服务器次数(比如设为1,集群总共3个节点,尝了第一个节点没连上后会尝试第二个节点,不成功就不会再尝第三个节点了)
+    MaxAutoRetriesNextServer: 2
+    #是否所有操作都可以重试.通常为false,post请求不会重试
+    OkToRetryOnAllOperations: false
+    #服务列表刷新间隔
+    ServerListRefreshInterval: 2000
+    #连接超时设置
+    ConnectTimeout: 3000
+    #读取返回超时设置
+    ReadTimeout: 3000
 ---
 spring:
   datasource:

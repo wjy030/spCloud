@@ -12,6 +12,7 @@ package com.wjy.product.service;
 
 import com.wjy.product.dao.ProductDao;
 import com.wjy.product.model.dao.ProductDO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,7 +28,8 @@ import java.util.List;
  */
 @Service
 public class ProductService {
-
+    @Value("${server.port}")
+    private String port;
     @Resource
     private ProductDao productDao;
 
@@ -36,7 +38,9 @@ public class ProductService {
     }
 
     public ProductDO findById(int id) {
-        return productDao.findById(id).get();
+        ProductDO productDO = productDao.findById(id).get();
+        productDO.setName(productDO.getName()+" data from port:"+port);
+        return productDO;
     }
 
     public void save(ProductDO productDO) {

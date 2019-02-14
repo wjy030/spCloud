@@ -2,18 +2,22 @@ server:
   port: 8761
   environment: prod
   datacenter: home
-  instance:
-    hostname: localhost
-  client:
-    registerWithEureka: false
-    fetchRegistry: false
-    serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
 spring:
   security:
     user:
       name: arthas
       password: 123456
+eureka:
+  instance:
+    appname: server
+    hostname: peer1
+    prefer-ip-address: true
+    instance-id: ${eureka.instance.appname}:${server.port}
+  client:
+    #    registerWithEureka: false
+    #    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://peer2:8762/eureka/,http://peer3:8763/eureka/
 #eureka:
 #  server:
 #    enable-self-preservation: true

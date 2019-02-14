@@ -1,11 +1,19 @@
 server:
   port: 8763
+spring:
+  profiles:
+    active: peer3
+---
 eureka:
   instance:
     hostname: peer3
-    appname: server3
+    appname: server
     prefer-ip-address: true
     instance-id: ${eureka.instance.appname}:${server.port}
   client:
-    service-url:
-      default-zone: http://localhost:8762/eureka/
+    serviceUrl:
+      defaultZone: http://peer2:8762/eureka/,http://arthas:123456@peer1:8761/eureka/
+  server:
+    enable-self-preservation: false
+spring:
+  profiles: peer3
